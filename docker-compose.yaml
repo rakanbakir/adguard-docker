@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+  adguard:
+    container_name: adguard
+    image: adguard/adguardhome
+    restart: always
+    ports:
+      - "3000:3000/tcp"
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80/tcp"
+      - "67:67/udp"
+      # - "68:68/tcp"
+      # - "68:68/udp"
+      - "443:443/tcp"
+      - "853:853/tcp"
+    volumes:
+      - './adguardhome/workdir:/opt/adguardhome/work/'
+      - './adguardhome/confdir:/opt/adguardhome/conf/'
+    # network_mode: "host"
+
+  adguard_exporter:
+    container_name: adguard_exporter
+    image: ebrianne/adguard-exporter:v1.13
+    restart: always
+    ports:
+      - "9617:9617"
+    environment:
+      - adguard_protocol=http
+      - adguard_hostname=${adguard_hostname}
+      - adguard_username=${adguard_username}
+      - adguard_password=${adguard_password}
+      - adguard_port= #optional
+      - interval=10s
+      - log_limit=10000
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.27.1
+    restart: always
+    volumes:
+      - './prometheus/prometheus.yml:/etc/prometheus/prometheus.yml'
+      - './prometheus/data/:/prometheus/'
+    ports:
+      - 9090:9090
+
+  grafana:
+    container_name: grafana-adguardhome
+    image: grafana/grafana:7.5.7
+    restart: always
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    ports:
+      - 8080:3000
+    volumes:
+      - './grafana/grafana-provisioning/dashboards/:/etc/grafana/provisioning/dashboards/'
+      - './grafana/grafana-provisioning/datasources/:/etc/grafana/provisioning/datasources/'
+      - './grafana/dashboards/:/var/lib/grafana/dashboards/'
+      - './grafana/data/:/var/lib/grafana/'

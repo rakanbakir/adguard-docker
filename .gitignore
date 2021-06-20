@@ -1,0 +1,6 @@
+grafana/data/*
+prometheus/data/*
+.DS_Store
+adguardhome/workdir/*
+adguardhome/confdir/*
+.env
