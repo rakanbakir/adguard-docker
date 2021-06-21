@@ -3,7 +3,7 @@ version: "3.8"
 services:
   adguard:
     container_name: adguard
-    image: adguard/adguardhome
+    image: adguard/adguardhome:v0.106.3
     restart: always
     ports:
       - "3000:3000/tcp"
@@ -18,7 +18,7 @@ services:
     volumes:
       - './adguardhome/workdir:/opt/adguardhome/work/'
       - './adguardhome/confdir:/opt/adguardhome/conf/'
-    # network_mode: "host"
+    # network_mode: "host" # on RPi enable this and disable ports
 
   adguard_exporter:
     container_name: adguard_exporter
@@ -46,7 +46,7 @@ services:
       - 9090:9090
 
   grafana:
-    container_name: grafana-adguardhome
+    container_name: grafana
     image: grafana/grafana:7.5.7
     restart: always
     environment:
